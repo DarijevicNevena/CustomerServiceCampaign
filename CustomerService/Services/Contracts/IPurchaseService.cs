@@ -10,5 +10,6 @@ namespace CustomerService.Services.Contracts
         Task DeletePurchaseAsync(int id);
         Task<bool> IsPurchaseDailyLimitForAgentMet(int agentId, int campaignId, DateTime day);
         Task<bool> IsPurchaseCreatedForCustomerInCampaign(int campaignId, int customerId);
+        Task<IEnumerable<Purchase>> GetPurchasesByCampaignAsync(int campaignId);
     }
 }

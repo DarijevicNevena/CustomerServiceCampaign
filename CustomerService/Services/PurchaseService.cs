@@ -69,5 +69,13 @@ namespace CustomerService.Services
 
             return purchases.Any();
         }
+
+        public async Task<IEnumerable<Purchase>> GetPurchasesByCampaignAsync(int campaignId)
+        {
+            var purchases = await _purchaseRepository.SearchAsync(p =>
+              p.CampaignId == campaignId);
+
+            return purchases.ToList();
+        }
     }
 }

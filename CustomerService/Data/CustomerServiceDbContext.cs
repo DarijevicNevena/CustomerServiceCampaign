@@ -37,6 +37,16 @@ namespace CustomerService.Data
                     Email = "nikolanikolic@gmail.com"
                 }
             );
+
+            modelBuilder.Entity<Purchase>()
+      .HasOne(p => p.Agent)
+      .WithMany(a => a.Purchases)
+      .HasForeignKey(p => p.AgentId);
+
+            modelBuilder.Entity<Purchase>()
+                .HasOne(p => p.Campaign)
+                .WithMany(c => c.Purchases)
+                .HasForeignKey(p => p.CampaignId);
         }
     }
 }

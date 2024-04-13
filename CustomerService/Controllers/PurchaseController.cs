@@ -1,7 +1,9 @@
-﻿using CustomerService.Models;
+﻿using Azure.Core;
+using CustomerService.Models;
 using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net.Http;
 using System.Runtime.Intrinsics.X86;
 using System.Text;

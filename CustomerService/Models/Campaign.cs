@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,5 +19,7 @@ namespace CustomerService.Models
 
         [Required(ErrorMessage = "End date is required")]
         public DateTime EndDate { get; set; }
+
+        public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
     }
 }

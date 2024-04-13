@@ -49,6 +49,7 @@ public class Program
         services.AddScoped<ICampaignService, CampaignService>();
         services.AddScoped<IPurchaseService, PurchaseServise>();
         services.AddScoped<ICustomerService, CustomerPersonService>();
+        services.AddScoped<ICampaignReportService, CampaignReportService>();
 
         // Register validators
         services.AddScoped<PurchaseValidator>();

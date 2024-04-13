@@ -1,6 +1,8 @@
 ﻿using CustomerService.Models;
+using CustomerService.Services;
 using CustomerService.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,10 +14,13 @@ namespace CustomerService.Controllers
     public class CampaignController : ControllerBase
     {
         private readonly ICampaignService _campaignService;
+        private readonly ICampaignReportService _reportService;
 
-        public CampaignController(ICampaignService campaignService)
+
+        public CampaignController(ICampaignService campaignService, ICampaignReportService reportService)
         {
             _campaignService = campaignService;
+            _reportService = reportService;
         }
 
         [HttpGet]
@@ -68,5 +73,29 @@ namespace CustomerService.Controllers
                 return NotFound();
             }
         }
+
+
+        [HttpGet("export/{campaignId}")]
+        public async Task<IActionResult> ExportPurchasesToCsv(int campaignId)
+        {
+            try
+            {
+                var csvData = await _reportService.GenerateCampaignPurchasesReport(campaignId);
+                return File(new System.Text.UTF8Encoding().GetBytes(csvData), "text/csv", $"campaign_{campaignId}_purchases.csv");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while generating the report: " + ex.Message);
+            }
+        }
+
     }
 }
