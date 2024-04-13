@@ -57,29 +57,34 @@ namespace CustomerService.Controllers
         [HttpPost("create", Name = "CreatePurchase")]
         public async Task<ActionResult<Purchase>> CreatePurchase([FromBody] Purchase purchase)
         {
-            // Validate agent and campaign data
-            var validationResult = await _purchaseValidator.ValidateAsync(purchase);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
-
-            // Check if customer with passed Id exists
-            var customerExists = await _customerService.DoesCustomerExist(purchase.CustomerId);
-            if (!customerExists)
-            {
-                ModelState.AddModelError("CustomError", "Customer does not exist!");
-                return BadRequest(ModelState);
-            }
-
             try
             {
+                // Validate other data in request
+                var validationResult = await _purchaseValidator.ValidateAsync(purchase);
+                if (!validationResult.IsValid)
+                {
+                    var errorResponse = validationResult.Errors.Select(e => new { Field = e.PropertyName, Error = e.ErrorMessage }).ToList();
+                    return BadRequest(new { errors = errorResponse });
+                }
+
+                // Check if customer with passed Id exists
+                var customerExists = await _customerService.DoesCustomerExist(purchase.CustomerId);
+                if (!customerExists)
+                {
+                    ModelState.AddModelError("CustomError", "Customer does not exist!");
+                    return BadRequest(ModelState);
+                }
+
                 var createdPurchase = await _purchaseService.CreateNewPurchaseAsync(purchase);
                 return CreatedAtAction(nameof(GetPurchaseById), new { id = createdPurchase.Id }, createdPurchase);
             }
             catch (ArgumentNullException)
             {
                 return BadRequest("Purchase cannot be null.");
+            }
+            catch (KeyNotFoundException)
+            {
+                return BadRequest("Invalid data sent.");
             }
         }
 

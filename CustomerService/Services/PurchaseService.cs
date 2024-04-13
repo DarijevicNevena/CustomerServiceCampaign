@@ -49,5 +49,24 @@ namespace CustomerService.Services
             }
             await _purchaseRepository.DeleteAsync(id);
         }
+
+        public async Task<bool> IsPurchaseDailyLimitForAgentMet(int agentId, int campaignId, DateTime day)
+        {
+            var purchases = await _purchaseRepository.SearchAsync(p =>
+                p.AgentId == agentId &&
+                p.CampaignId == campaignId &&
+                p.Date.Date == day.Date);
+
+            return purchases.Count() >= 5;
+        }
+
+        public async Task<bool> IsPurchaseCreatedForCustomerInCampaign(int campaignId, int customerId)
+        {
+            var purchases = await _purchaseRepository.SearchAsync(p =>
+               p.CustomerId == customerId &&
+               p.CampaignId == campaignId);
+
+            return purchases.Any();
+        }
     }
 }
