@@ -1,6 +1,6 @@
 ﻿using CustomerService.Data;
 using CustomerService.Models;
-using CustomerService.Services;
+using CustomerService.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

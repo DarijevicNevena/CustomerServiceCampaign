@@ -1,5 +1,6 @@
-﻿using CustomerService.Data;
+﻿using CustomerService.Data.Base;
 using CustomerService.Models;
+using CustomerService.Services.Contracts;
 
 namespace CustomerService.Services
 {

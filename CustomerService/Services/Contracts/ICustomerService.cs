@@ -1,4 +1,4 @@
-﻿namespace CustomerService.Services
+﻿namespace CustomerService.Services.Contracts
 {
     public interface ICustomerService
     {

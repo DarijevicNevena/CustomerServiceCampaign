@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace CustomerService.Data
+namespace CustomerService.Data.Base
 {
     public class Repository<T> : IRepository<T> where T : class
     {

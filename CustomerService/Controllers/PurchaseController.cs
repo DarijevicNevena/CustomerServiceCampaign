@@ -1,5 +1,5 @@
 ﻿using CustomerService.Models;
-using CustomerService.Services;
+using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;

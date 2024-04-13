@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace CustomerService.Data
+namespace CustomerService.Data.Base
 {
     public interface IRepository<T>
     {

@@ -1,5 +1,5 @@
 ﻿using CustomerService.Models;
-using CustomerService.Services;
+using CustomerService.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

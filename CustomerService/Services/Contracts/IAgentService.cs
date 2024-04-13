@@ -1,6 +1,6 @@
 ﻿using CustomerService.Models;
 
-namespace CustomerService.Services
+namespace CustomerService.Services.Contracts
 {
     public interface IAgentService
     {

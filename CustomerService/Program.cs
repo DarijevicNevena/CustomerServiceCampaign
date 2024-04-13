@@ -1,5 +1,7 @@
 using CustomerService.Data;
+using CustomerService.Data.Base;
 using CustomerService.Services;
+using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;

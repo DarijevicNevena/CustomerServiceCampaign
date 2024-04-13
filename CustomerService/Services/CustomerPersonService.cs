@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using CustomerService.Services.Contracts;
 
 namespace CustomerService.Services
 {
