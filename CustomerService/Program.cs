@@ -46,12 +46,14 @@ public class Program
         services.AddScoped<IAgentService, AgentService>();
         services.AddScoped<ICampaignService, CampaignService>();
         services.AddScoped<IPurchaseService, PurchaseServise>();
+        services.AddScoped<ICustomerService, CustomerPersonService>();
 
         // Register validators
         services.AddScoped<PurchaseValidator>();
 
         // Register HTTP client
         services.AddHttpClient();
+        services.AddHttpClient<ICustomerService, CustomerPersonService>();
 
         // Add Swagger services
         services.AddSwaggerGen(c =>

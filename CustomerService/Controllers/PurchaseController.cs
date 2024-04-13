@@ -18,12 +18,14 @@ namespace CustomerService.Controllers
     public class PurchaseController : ControllerBase
     {
         private readonly IPurchaseService _purchaseService;
+        private readonly ICustomerService _customerService;
         private readonly PurchaseValidator _purchaseValidator;
         private readonly HttpClient _httpClient;
 
-        public PurchaseController(IPurchaseService purchaseService, PurchaseValidator purchaseValidator, HttpClient httpClient)
+        public PurchaseController(IPurchaseService purchaseService, ICustomerService customerService, PurchaseValidator purchaseValidator, HttpClient httpClient)
         {
             _purchaseService = purchaseService;
+            _customerService = customerService;
             _purchaseValidator = purchaseValidator;
             _httpClient = httpClient;
         }
@@ -55,10 +57,19 @@ namespace CustomerService.Controllers
         [HttpPost("create", Name = "CreatePurchase")]
         public async Task<ActionResult<Purchase>> CreatePurchase([FromBody] Purchase purchase)
         {
+            // Validate agent and campaign data
             var validationResult = await _purchaseValidator.ValidateAsync(purchase);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.Errors);
+            }
+
+            // Check if customer with passed Id exists
+            var customerExists = await _customerService.DoesCustomerExist(purchase.CustomerId);
+            if (!customerExists)
+            {
+                ModelState.AddModelError("CustomError", "Customer does not exist!");
+                return BadRequest(ModelState);
             }
 
             try
@@ -153,5 +164,39 @@ namespace CustomerService.Controllers
             }
         }
 
+        [HttpGet("customer-exists/{customerId:int}", Name = "CustomerExistCheck")]
+        public async Task<IActionResult> CustomerExistCheck(int customerId)
+        {
+            if (customerId <= 0)
+                return BadRequest("Invalid customer ID");
+            string soapApiUrl = $"https://www.crcind.com/csp/samples/SOAP.Demo.cls?soap_method=FindPerson&id={customerId}";
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(soapApiUrl);
+
+                if (!response.IsSuccessStatusCode)
+                    return StatusCode((int)response.StatusCode, "SOAP service returned an error");
+
+                string xmlResponse = await response.Content.ReadAsStringAsync();
+                XDocument xmlDoc = XDocument.Parse(xmlResponse);
+
+                XNamespace ns = "http://tempuri.org";
+                XElement customerElement = xmlDoc.Descendants(ns + "FindPersonResult").FirstOrDefault();
+
+                if (customerElement == null)
+                    return NotFound();
+
+                return Ok(true);
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, "Error accessing SOAP service");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Server error");
+            }
+        }
     }
 }
