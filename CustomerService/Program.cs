@@ -56,7 +56,7 @@ public class Program
              ValidateAudience = true,
              ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
              ValidateLifetime = true,
-             ClockSkew = TimeSpan.Zero  // Reduces the time skew for token expiration
+             ClockSkew = TimeSpan.Zero
          };
      });
 
@@ -73,6 +73,8 @@ public class Program
         services.AddScoped<IPurchaseService, PurchaseService>();
         services.AddScoped<ICustomerService, CustomerPersonService>();
         services.AddScoped<ICampaignReportService, CampaignReportService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 
         // Validators
         services.AddScoped<PurchaseValidator>();

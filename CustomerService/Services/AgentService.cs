@@ -13,25 +13,6 @@ namespace CustomerService.Services
         {
             _agentRepository = agentRepository;
         }
-        public async Task<Agent> AuthenticateAgent(string email, string password)
-        {
-
-            var foundAgents = await _agentRepository.SearchAsync(a => a.Email == email);
-
-
-            // Check the provided password against the stored hash
-            if (foundAgents.Count() == 1 && VerifyPasswordHash(password, foundAgents.Single().PasswordHash))
-            {
-                return foundAgents.Single();
-            }
-
-            return null;
-        }
-
-        private bool VerifyPasswordHash(string password, string? storedHash)
-        {
-            return BCrypt.Net.BCrypt.Verify(password, storedHash);
-        }
 
         public async Task<IEnumerable<Agent>> GetAllAgentsAsync()
         {
@@ -46,6 +27,16 @@ namespace CustomerService.Services
                 throw new KeyNotFoundException($"Agent with ID {id} not found.");
             }
             return agent;
+        }
+
+        public async Task<Agent> GetAgentByEmailAsync(string email)
+        {
+            var agent = await _agentRepository.SearchAsync(a => a.Email == email);
+            if (agent.Count() == 0)
+            {
+                throw new KeyNotFoundException($"Agent with email {email} not found.");
+            }
+            return agent.Single();
         }
     }
 }
