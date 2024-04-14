@@ -1,11 +1,13 @@
 ﻿using CustomerService.Models;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace CustomerService.Data
 {
     public class CustomerServiceDbContext : DbContext
     {
-        public CustomerServiceDbContext(DbContextOptions<CustomerServiceDbContext> options) : base(options) {
+        public CustomerServiceDbContext(DbContextOptions<CustomerServiceDbContext> options) : base(options)
+        {
         }
 
         public DbSet<Agent> Agents { get; set; }
@@ -14,34 +16,38 @@ namespace CustomerService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Seed agents with hashed passwords
             modelBuilder.Entity<Agent>().HasData(
                 new Agent()
                 {
                     Id = 1,
                     FirstName = "Marko",
                     LastName = "Markovic",
-                    Email = "markomarkovic@gmail.com"
+                    Email = "markomarkovic@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("marko123") // Example password hashed
                 },
                 new Agent()
                 {
                     Id = 2,
                     FirstName = "Ivan",
                     LastName = "Ivanovic",
-                    Email = "ivanivanovic@gmail.com"
+                    Email = "ivanivanovic@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("ivan123") // Example password hashed
                 },
                 new Agent()
                 {
                     Id = 3,
                     FirstName = "Nikola",
                     LastName = "Nikolic",
-                    Email = "nikolanikolic@gmail.com"
+                    Email = "nikolanikolic@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("nikola123") // Example password hashed
                 }
             );
 
             modelBuilder.Entity<Purchase>()
-      .HasOne(p => p.Agent)
-      .WithMany(a => a.Purchases)
-      .HasForeignKey(p => p.AgentId);
+                .HasOne(p => p.Agent)
+                .WithMany(a => a.Purchases)
+                .HasForeignKey(p => p.AgentId);
 
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.Campaign)

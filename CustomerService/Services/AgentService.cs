@@ -1,6 +1,7 @@
 ﻿using CustomerService.Data.Base;
 using CustomerService.Models;
 using CustomerService.Services.Contracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomerService.Services
 {
@@ -11,6 +12,25 @@ namespace CustomerService.Services
         public AgentService(IRepository<Agent> agentRepository)
         {
             _agentRepository = agentRepository;
+        }
+        public async Task<Agent> AuthenticateAgent(string email, string password)
+        {
+
+            var foundAgents = await _agentRepository.SearchAsync(a => a.Email == email);
+
+
+            // Check the provided password against the stored hash
+            if (foundAgents.Count() == 1 && VerifyPasswordHash(password, foundAgents.Single().PasswordHash))
+            {
+                return foundAgents.Single();
+            }
+
+            return null;
+        }
+
+        private bool VerifyPasswordHash(string password, string? storedHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, storedHash);
         }
 
         public async Task<IEnumerable<Agent>> GetAllAgentsAsync()

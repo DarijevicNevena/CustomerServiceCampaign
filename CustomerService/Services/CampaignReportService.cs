@@ -17,6 +17,7 @@ namespace CustomerService.Services
 
         public async Task<string> GenerateCampaignPurchasesReport(int campaignId)
         {
+            //Check if campaign exist
             var campaign = await _campaignService.GetCampaignByIdAsync(campaignId);
             if (campaign == null)
             {
@@ -36,6 +37,7 @@ namespace CustomerService.Services
                 throw new InvalidOperationException("You can only obtain a report one month after the campaign end date.");
             }
 
+            //Get purchases for requested campaign
             var purchases = await _purchaseService.GetPurchasesByCampaignAsync(campaignId);
             if (purchases == null || !purchases.Any())
             {

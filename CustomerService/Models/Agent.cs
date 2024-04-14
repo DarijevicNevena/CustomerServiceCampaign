@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,9 +21,12 @@ namespace CustomerService.Models
 
         [Required]
         [MaxLength(50)]
+        [EmailAddress]
+        [JsonIgnore]
         public string? Email { get; set; }
 
-        public string? Password { get; set; }
+        [JsonIgnore]
+        public string? PasswordHash { get; set; }
 
         public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
     }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace CustomerService.Services
 {
-    public class PurchaseServise : IPurchaseService
+    public class PurchaseService : IPurchaseService
     {
         private readonly IRepository<Purchase> _purchaseRepository;
 
-        public PurchaseServise(IRepository<Purchase> purchaseRepository)
+        public PurchaseService(IRepository<Purchase> purchaseRepository)
         {
             _purchaseRepository = purchaseRepository;
         }

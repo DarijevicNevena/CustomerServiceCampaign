@@ -1,6 +1,7 @@
 ﻿using CustomerService.Models;
 using CustomerService.Services;
 using CustomerService.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class CampaignController : ControllerBase
@@ -24,6 +26,7 @@ namespace CustomerService.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Campaign>>> GetCampaigns()
         {
             var campaigns = await _campaignService.GetAllCampaignsAsync();
@@ -31,6 +34,7 @@ namespace CustomerService.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCampaignById")]
+        [Authorize]
         public async Task<ActionResult<Campaign>> GetCampaignById(int id)
         {
             try
@@ -45,6 +49,7 @@ namespace CustomerService.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("/createCampaign")]
         public async Task<ActionResult<Campaign>> CreateCampaign([FromBody] Campaign campaign)
         {
@@ -61,6 +66,7 @@ namespace CustomerService.Controllers
 
         //TODO: Check if this is okay to have
         [HttpDelete("{id:int}", Name = "DeleteCampaign")]
+        [Authorize]
         public async Task<IActionResult> DeleteCampaign(int id)
         {
             try

@@ -2,6 +2,7 @@
 using CustomerService.Models;
 using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http;
@@ -34,6 +35,8 @@ namespace CustomerService.Controllers
 
         // GET: api/<PurchaseController>
         [HttpGet]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<Purchase>>> GetPurchases()
         {
             var purchases = await _purchaseService.GetAllPurchasesAsync();
@@ -42,6 +45,8 @@ namespace CustomerService.Controllers
 
         // GET api/<PurchaseController>/5
         [HttpGet("{id:int}", Name = "GetPurchaseById")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Purchase>> GetPurchaseById(int id)
         {
             try
@@ -57,6 +62,8 @@ namespace CustomerService.Controllers
 
         // POST api/<PurchaseController>
         [HttpPost("create", Name = "CreatePurchase")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Purchase>> CreatePurchase([FromBody] Purchase purchase)
         {
             try
@@ -92,13 +99,17 @@ namespace CustomerService.Controllers
 
         // PUT api/<PurchaseController>/5
         [HttpPut("{id}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public void Put(int id, [FromBody] string value)
         {
             //Can purchase be changed???
         }
 
-        // DELETE api/<PurchaseController>/5
+        // DELETE api/<PurchaseController>/5]
         [HttpDelete("{id:int}", Name = "DeletePurchase")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeletePurchase(int id)
         {
             try
@@ -113,6 +124,8 @@ namespace CustomerService.Controllers
         }
 
         [HttpGet("customer/{customerId:int}", Name = "GetCustomerInfoById")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Customer>> GetCustomerInfoById(int customerId)
         {
             if (customerId <= 0)
@@ -172,6 +185,8 @@ namespace CustomerService.Controllers
         }
 
         [HttpGet("customer-exists/{customerId:int}", Name = "CustomerExistCheck")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CustomerExistCheck(int customerId)
         {
             if (customerId <= 0)

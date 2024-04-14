@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 using CustomerService.Data;
-using CustomerService.Data.Base;
 using CustomerService.Services;
 using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using CustomerService.Data.Base;
 
 public class Program
 {
@@ -12,57 +15,103 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Configure services and JWT authentication
         ConfigureServices(builder.Services, builder.Configuration);
 
         var app = builder.Build();
 
+        // Configure middleware
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Customer Service Campaign v1"));
         }
 
         app.UseHttpsRedirection();
+        app.UseAuthentication();
         app.UseAuthorization();
+
         app.MapControllers();
 
         app.Run();
     }
+
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        // Add DbContext
-        var connectionString = configuration.GetConnectionString("CustomerServiceConnection");
-        services.AddDbContext<CustomerServiceDbContext>(options => options.UseSqlServer(connectionString));
+        // Database Context
+        services.AddDbContext<CustomerServiceDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("CustomerServiceConnection")));
 
-        // Add authorization services
+        // JWT Authentication
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+     .AddJwtBearer(options =>
+     {
+         options.TokenValidationParameters = new TokenValidationParameters
+         {
+             ValidateIssuerSigningKey = true,
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY"))),
+             ValidateIssuer = true,
+             ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+             ValidateAudience = true,
+             ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+             ValidateLifetime = true,
+             ClockSkew = TimeSpan.Zero  // Reduces the time skew for token expiration
+         };
+     });
+
+        // Authorization
         services.AddAuthorization();
 
-        // Add controllers
+        // Controllers
         services.AddControllers();
 
-        // Register repositories
+        // Repositories and Services
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-
-        // Register services
         services.AddScoped<IAgentService, AgentService>();
         services.AddScoped<ICampaignService, CampaignService>();
-        services.AddScoped<IPurchaseService, PurchaseServise>();
+        services.AddScoped<IPurchaseService, PurchaseService>();
         services.AddScoped<ICustomerService, CustomerPersonService>();
         services.AddScoped<ICampaignReportService, CampaignReportService>();
 
-        // Register validators
+        // Validators
         services.AddScoped<PurchaseValidator>();
 
-        // Register HTTP client
+        // HTTP Client
         services.AddHttpClient();
-        services.AddHttpClient<ICustomerService, CustomerPersonService>();
 
-        // Add Swagger services
+        // Swagger Configuration
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "Customer Service Campaign", Version = "v1" });
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header,
+                    },
+                    new List<string>()
+                }
+            });
         });
     }
-
 }
