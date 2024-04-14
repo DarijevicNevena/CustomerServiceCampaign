@@ -1,5 +1,7 @@
-﻿using CustomerService.Data.Base;
+﻿using AutoMapper;
+using CustomerService.Data.Base;
 using CustomerService.Models;
+using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -10,10 +12,12 @@ namespace CustomerService.Services
     public class PurchaseService : IPurchaseService
     {
         private readonly IRepository<Purchase> _purchaseRepository;
+        private readonly IMapper _mapper;
 
-        public PurchaseService(IRepository<Purchase> purchaseRepository)
+        public PurchaseService(IRepository<Purchase> purchaseRepository, IMapper mapper)
         {
             _purchaseRepository = purchaseRepository;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Purchase>> GetAllPurchasesAsync()
@@ -31,16 +35,19 @@ namespace CustomerService.Services
             return purchase;
         }
 
-        public async Task<Purchase> CreateNewPurchaseAsync(Purchase purchase)
+        public async Task<PurchaseReadDto> CreateNewPurchaseAsync(PurchaseWriteDto purchaseDto, int campaignId)
         {
-            if (purchase == null)
+            if (purchaseDto == null)
             {
-                throw new ArgumentNullException(nameof(purchase), "Purchase cannot be null.");
+                throw new ArgumentNullException(nameof(purchaseDto), "Purchase cannot be null.");
             }
 
-            return await _purchaseRepository.AddAsync(purchase);
-        }
+            var purchase = _mapper.Map<Purchase>(purchaseDto);
+            purchase.CampaignId = campaignId;
 
+            var createdPurchase = await _purchaseRepository.AddAsync(purchase);
+            return _mapper.Map<PurchaseReadDto>(createdPurchase);
+        }
         public async Task DeletePurchaseAsync(int id)
         {
             var purchaseToDelete = await _purchaseRepository.GetByIdAsync(id);

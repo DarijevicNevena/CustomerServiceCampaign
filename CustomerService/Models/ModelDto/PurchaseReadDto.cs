@@ -1,14 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace CustomerService.Models
+namespace CustomerService.Models.ModelDto
 {
-    public class Purchase
+    public class PurchaseReadDto
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
 
         [Required]
         public int AgentId { get; set; }
@@ -30,8 +25,5 @@ namespace CustomerService.Models
 
         [Required]
         public DateTime Date { get; set; }
-
-        public virtual Agent Agent { get; set; }
-        public virtual Campaign Campaign { get; set; }
     }
 }

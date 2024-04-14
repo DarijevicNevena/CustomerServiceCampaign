@@ -1,98 +1,79 @@
 ﻿using CustomerService.Models;
+using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using FluentValidation;
 using FluentValidation.Results;
 
 namespace CustomerService.Validators.EntityValidators
 {
-    public class PurchaseValidator : AbstractValidator<Purchase>, IValidator<Purchase>
+    public class PurchaseValidator
     {
         private readonly IAgentService _agentService;
         private readonly IPurchaseService _purchaseService;
         private readonly ICampaignService _campaignService;
+        private readonly ICustomerService _customerService;
 
         public PurchaseValidator(
         IAgentService agentService,
         IPurchaseService purchaseService,
-        ICampaignService campaignService) : this()
+        ICampaignService campaignService, 
+        ICustomerService customerService)
         {
             _agentService = agentService;
             _purchaseService = purchaseService;
             _campaignService = campaignService;
+            _customerService = customerService;
 
-            SetupRules();
         }
 
-        public PurchaseValidator()
+        public async Task<PurchaseValidationResult> ValidateAsync(PurchaseWriteDto purchase)
         {
-            SetupRules();
-        }
+            var result = new PurchaseValidationResult();
 
-        private void SetupRules()
-        {
-            RuleFor(purchase => purchase.AgentId)
-                .NotEmpty().WithMessage("Agent ID is required.");
+            // Check customer
+            var customerExists = await _customerService.DoesCustomerExist(purchase.CustomerId);
+            if (!customerExists)
+            {
+                result.ValidationResult.Errors.Add(new ValidationFailure("CustomerId", "Customer does not exist."));
+            }
 
-            RuleFor(purchase => purchase.CustomerId)
-                .NotEmpty().WithMessage("Customer ID is required.");
-
-            RuleFor(purchase => purchase.CampaignId)
-                .NotEmpty().WithMessage("Campaign ID is required.");
-
-            RuleFor(purchase => purchase.Price)
-                .NotEmpty().WithMessage("Price is required.")
-                .GreaterThan(0).WithMessage("Price must be greater than 0.");
-
-            RuleFor(purchase => purchase.Discount)
-                .NotEmpty().WithMessage("Discount is required.")
-                .GreaterThan(0).WithMessage("Discount must be greater than 0.");
-
-            RuleFor(purchase => purchase.Date)
-                .NotEmpty().WithMessage("Date is required.");
-
-            RuleFor(purchase => purchase.Discount).LessThan(purchase => purchase.Price).WithMessage("Discount must be less than Price.");
-        }
-
-        public async Task<ValidationResult> ValidateAsync(Purchase purchase)
-        {
-            var validationResult = new ValidationResult();
-
-            //Check if agent exists
+            // Check if agent exists
             var agent = await _agentService.GetAgentByIdAsync(purchase.AgentId);
             if (agent == null)
             {
-                validationResult.Errors.Add(new ValidationFailure("AgentId", "Agent does not exist."));
+                result.ValidationResult.Errors.Add(new ValidationFailure("AgentId", "Agent does not exist."));
             }
 
-            //Check if campaign exists
-            var campaign = await _campaignService.GetCampaignByIdAsync(purchase.CampaignId);
+            // Check if campaign exists
+            var campaign = await _campaignService.GetCampaignByNameAsync(purchase.CampaignName);
             if (campaign == null)
             {
-                validationResult.Errors.Add(new ValidationFailure("CampaignId", "Campaign does not exist."));
+                result.ValidationResult.Errors.Add(new ValidationFailure("CampaignId", "Campaign does not exist."));
             }
-
-            //Check if campaign is still opened when purchase is entered
-            if (purchase.Date.Date < campaign?.StartDate.Date || purchase.Date.Date > campaign?.EndDate.Date)
+            else
             {
-                validationResult.Errors.Add(new ValidationFailure("PurchaseId", "Campaign has expired."));
+                result.CampaignId = campaign.Id;  // Set the CampaignId for later use
+
+                // Check if campaign is still opened when purchase is entered
+                if (DateTime.Today.Date < campaign.StartDate.Date || DateTime.Today.Date > campaign.EndDate.Date)
+                {
+                    result.ValidationResult.Errors.Add(new ValidationFailure("PurchaseId", "Campaign has expired."));
+                }
+
+                // Check agent's daily limit for specific campaign
+                if (await _purchaseService.IsPurchaseDailyLimitForAgentMet(purchase.AgentId, campaign.Id, DateTime.Today))
+                {
+                    result.ValidationResult.Errors.Add(new ValidationFailure("PurchaseId", "Agent's daily limit for this campaign is met."));
+                }
+
+                // Check if there's already a purchase for this customer for the specific campaign
+                if (await _purchaseService.IsPurchaseCreatedForCustomerInCampaign(campaign.Id, purchase.CustomerId))
+                {
+                    result.ValidationResult.Errors.Add(new ValidationFailure("PurchaseId", "Purchase for specific customer in this campaign already exists."));
+                }
             }
 
-            //Check agent's daily limit for specific campaign
-            if (await _purchaseService.IsPurchaseDailyLimitForAgentMet(purchase.AgentId, purchase.CampaignId, DateTime.Today))
-            {
-                validationResult.Errors.Add(new ValidationFailure("PurchaseId", "Agent's daily limit for this campaign is met."));
-            }
-
-            //Check is there already a purchase for this customer for specific campaign
-            if (await _purchaseService.IsPurchaseCreatedForCustomerInCampaign(purchase.CampaignId, purchase.CustomerId))
-            {
-                validationResult.Errors.Add(new ValidationFailure("PurchaseId", "Purchase for specific customer in this campaign already exists."));
-            }
-
-
-            //Check agent's daily limit
-
-            return validationResult;
+            return result;
         }
     }
 }

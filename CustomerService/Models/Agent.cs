@@ -22,10 +22,8 @@ namespace CustomerService.Models
         [Required]
         [MaxLength(50)]
         [EmailAddress]
-        [JsonIgnore]
         public string? Email { get; set; }
 
-        [JsonIgnore]
         public string? PasswordHash { get; set; }
 
         public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();

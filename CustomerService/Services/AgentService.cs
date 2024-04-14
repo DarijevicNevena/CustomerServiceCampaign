@@ -1,5 +1,7 @@
-﻿using CustomerService.Data.Base;
+﻿using AutoMapper;
+using CustomerService.Data.Base;
 using CustomerService.Models;
+using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,25 +10,28 @@ namespace CustomerService.Services
     public class AgentService : IAgentService
     {
         private readonly IRepository<Agent> _agentRepository;
+        private readonly IMapper _mapper;
 
-        public AgentService(IRepository<Agent> agentRepository)
+        public AgentService(IRepository<Agent> agentRepository, IMapper mapper)
         {
             _agentRepository = agentRepository;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Agent>> GetAllAgentsAsync()
+        public async Task<IEnumerable<AgentReadDto>> GetAllAgentsAsync()
         {
-            return await _agentRepository.GetAllAsync();
+            var agents = await _agentRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<AgentReadDto>>(agents);
         }
 
-        public async Task<Agent> GetAgentByIdAsync(int id)
+        public async Task<AgentReadDto> GetAgentByIdAsync(int id)
         {
             var agent = await _agentRepository.GetByIdAsync(id);
             if (agent == null)
             {
                 throw new KeyNotFoundException($"Agent with ID {id} not found.");
             }
-            return agent;
+            return _mapper.Map<AgentReadDto>(agent);
         }
 
         public async Task<Agent> GetAgentByEmailAsync(string email)

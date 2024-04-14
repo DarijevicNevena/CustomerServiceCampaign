@@ -1,12 +1,8 @@
 ﻿using CustomerService.Models;
-using CustomerService.Services;
+using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
 {
@@ -27,7 +23,7 @@ namespace CustomerService.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Campaign>>> GetCampaigns()
+        public async Task<ActionResult<IEnumerable<CampaignReadDto>>> GetCampaigns()
         {
             var campaigns = await _campaignService.GetAllCampaignsAsync();
             return Ok(campaigns);
@@ -35,7 +31,7 @@ namespace CustomerService.Controllers
 
         [HttpGet("{id:int}", Name = "GetCampaignById")]
         [Authorize]
-        public async Task<ActionResult<Campaign>> GetCampaignById(int id)
+        public async Task<ActionResult<CampaignReadDto>> GetCampaignById(int id)
         {
             try
             {
@@ -51,12 +47,12 @@ namespace CustomerService.Controllers
         [HttpPost]
         [Authorize]
         [Route("/createCampaign")]
-        public async Task<ActionResult<Campaign>> CreateCampaign([FromBody] Campaign campaign)
+        public async Task<ActionResult<CampaignReadDto>> CreateCampaign([FromBody] CampaignWriteDto campaign)
         {
             try
             {
                 var createdCampaign = await _campaignService.CreateNewCampaignAsync(campaign);
-                return CreatedAtAction(nameof(GetCampaignById), new { id = createdCampaign.Id }, createdCampaign);
+                return Ok(createdCampaign);
             }
             catch (ArgumentNullException)
             {

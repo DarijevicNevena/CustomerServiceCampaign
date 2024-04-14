@@ -8,6 +8,7 @@ using CustomerService.Services;
 using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
 using CustomerService.Data.Base;
+using CustomerService.Models.ModelDto.Mapping;
 
 public class Program
 {
@@ -65,6 +66,9 @@ public class Program
 
         // Controllers
         services.AddControllers();
+
+        //Mappers
+        services.AddAutoMapper(typeof(AutoMapperProfile));
 
         // Repositories and Services
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

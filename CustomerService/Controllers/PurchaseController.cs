@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using CustomerService.Models;
+using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Runtime.Intrinsics.X86;
+using System.Security.Claims;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -64,37 +66,28 @@ namespace CustomerService.Controllers
         [HttpPost("create", Name = "CreatePurchase")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<Purchase>> CreatePurchase([FromBody] Purchase purchase)
+        public async Task<ActionResult<PurchaseReadDto>> CreatePurchase([FromBody] PurchaseWriteDto purchaseDto)
         {
-            try
+            if (!User.Identity.IsAuthenticated)
             {
-                // Validate other data in request
-                var validationResult = await _purchaseValidator.ValidateAsync(purchase);
-                if (!validationResult.IsValid)
-                {
-                    var errorResponse = validationResult.Errors.Select(e => new { Field = e.PropertyName, Error = e.ErrorMessage }).ToList();
-                    return BadRequest(new { errors = errorResponse });
-                }
+                return Unauthorized();
+            }
 
-                // Check if customer with passed Id exists
-                var customerExists = await _customerService.DoesCustomerExist(purchase.CustomerId);
-                if (!customerExists)
-                {
-                    ModelState.AddModelError("CustomError", "Customer does not exist!");
-                    return BadRequest(ModelState);
-                }
+            // Retrieve agent ID from token
+            var agentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(agentId))
+            {
+                return Unauthorized("Agent ID is missing in the token.");
+            }
+            purchaseDto.AgentId = int.Parse(agentId);
+            var validationResult = await _purchaseValidator.ValidateAsync(purchaseDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.ValidationResult);
+            }
 
-                var createdPurchase = await _purchaseService.CreateNewPurchaseAsync(purchase);
-                return CreatedAtAction(nameof(GetPurchaseById), new { id = createdPurchase.Id }, createdPurchase);
-            }
-            catch (ArgumentNullException)
-            {
-                return BadRequest("Purchase cannot be null.");
-            }
-            catch (KeyNotFoundException)
-            {
-                return BadRequest("Invalid data sent.");
-            }
+            var createdPurchase = await _purchaseService.CreateNewPurchaseAsync(purchaseDto, validationResult.CampaignId.Value);
+            return Ok(createdPurchase);
         }
 
         // PUT api/<PurchaseController>/5

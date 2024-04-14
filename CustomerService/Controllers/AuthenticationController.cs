@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using CustomerService.Services.Contracts;
 using CustomerService.Models;
-using CustomerService.DTOs;
+using CustomerService.Models.ModelDto;
 
 namespace CustomerService.Controllers
 {

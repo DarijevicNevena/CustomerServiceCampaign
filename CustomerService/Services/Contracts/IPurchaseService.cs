@@ -1,4 +1,5 @@
 ﻿using CustomerService.Models;
+using CustomerService.Models.ModelDto;
 
 namespace CustomerService.Services.Contracts
 {
@@ -6,7 +7,7 @@ namespace CustomerService.Services.Contracts
     {
         Task<IEnumerable<Purchase>> GetAllPurchasesAsync();
         Task<Purchase> GetPurchaseByIdAsync(int id);
-        Task<Purchase> CreateNewPurchaseAsync(Purchase purchase);
+        Task<PurchaseReadDto> CreateNewPurchaseAsync(PurchaseWriteDto purchase,int campaignId);
         Task DeletePurchaseAsync(int id);
         Task<bool> IsPurchaseDailyLimitForAgentMet(int agentId, int campaignId, DateTime day);
         Task<bool> IsPurchaseCreatedForCustomerInCampaign(int campaignId, int customerId);

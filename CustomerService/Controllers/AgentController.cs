@@ -1,10 +1,6 @@
-﻿using CustomerService.Data;
-using CustomerService.Models;
+﻿using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-
 
 namespace CustomerService.Controllers
 {
@@ -20,14 +16,14 @@ namespace CustomerService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Agent>>> GetAgents()
+        public async Task<ActionResult<IEnumerable<AgentReadDto>>> GetAgents()
         {
             var agents = await _agentService.GetAllAgentsAsync();
             return Ok(agents);
         }
 
         [HttpGet("{id:int}", Name = "GetAgentbyId")]
-        public async Task<ActionResult<Agent>> GetAgentById(int id)
+        public async Task<ActionResult<AgentReadDto>> GetAgentById(int id)
         {
             try
             {
