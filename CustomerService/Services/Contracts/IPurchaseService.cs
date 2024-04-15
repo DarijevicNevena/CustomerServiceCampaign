@@ -5,8 +5,8 @@ namespace CustomerService.Services.Contracts
 {
     public interface IPurchaseService
     {
-        Task<IEnumerable<Purchase>> GetAllPurchasesAsync();
-        Task<Purchase> GetPurchaseByIdAsync(int id);
+        Task<IEnumerable<PurchaseReadDto>> GetAllPurchasesAsync();
+        Task<PurchaseReadDto> GetPurchaseByIdAsync(int id);
         Task<PurchaseReadDto> CreateNewPurchaseAsync(PurchaseWriteDto purchase,int campaignId);
         Task DeletePurchaseAsync(int id);
         Task<bool> IsPurchaseDailyLimitForAgentMet(int agentId, int campaignId, DateTime day);

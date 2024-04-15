@@ -16,7 +16,7 @@ namespace CustomerService.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Seed agents with hashed passwords
+            // Seed agents data and with hashed passwords
             modelBuilder.Entity<Agent>().HasData(
                 new Agent()
                 {
@@ -24,7 +24,7 @@ namespace CustomerService.Data
                     FirstName = "Marko",
                     LastName = "Markovic",
                     Email = "markomarkovic@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("marko123") // Example password hashed
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("marko123")
                 },
                 new Agent()
                 {
@@ -32,7 +32,7 @@ namespace CustomerService.Data
                     FirstName = "Ivan",
                     LastName = "Ivanovic",
                     Email = "ivanivanovic@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("ivan123") // Example password hashed
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("ivan123")
                 },
                 new Agent()
                 {
@@ -40,7 +40,7 @@ namespace CustomerService.Data
                     FirstName = "Nikola",
                     LastName = "Nikolic",
                     Email = "nikolanikolic@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("nikola123") // Example password hashed
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("nikola123")
                 }
             );
 

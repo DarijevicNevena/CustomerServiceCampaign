@@ -2,9 +2,6 @@
 using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CustomerService.Services
 {

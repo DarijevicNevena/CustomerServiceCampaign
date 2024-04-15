@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using Microsoft.IdentityModel.Tokens;

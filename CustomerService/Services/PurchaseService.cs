@@ -3,9 +3,6 @@ using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CustomerService.Services
 {
@@ -20,19 +17,20 @@ namespace CustomerService.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Purchase>> GetAllPurchasesAsync()
+        public async Task<IEnumerable<PurchaseReadDto>> GetAllPurchasesAsync()
         {
-            return await _purchaseRepository.GetAllAsync();
+            var purchases = await _purchaseRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<PurchaseReadDto>>(purchases);
         }
 
-        public async Task<Purchase> GetPurchaseByIdAsync(int id)
+        public async Task<PurchaseReadDto> GetPurchaseByIdAsync(int id)
         {
             var purchase = await _purchaseRepository.GetByIdAsync(id);
             if (purchase == null)
             {
                 throw new KeyNotFoundException($"Purchase with ID {id} not found.");
             }
-            return purchase;
+            return _mapper.Map<PurchaseReadDto>(purchase);
         }
 
         public async Task<PurchaseReadDto> CreateNewPurchaseAsync(PurchaseWriteDto purchaseDto, int campaignId)

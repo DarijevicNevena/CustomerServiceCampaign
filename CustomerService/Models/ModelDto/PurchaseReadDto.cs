@@ -4,7 +4,6 @@ namespace CustomerService.Models.ModelDto
 {
     public class PurchaseReadDto
     {
-
         [Required]
         public int AgentId { get; set; }
 
