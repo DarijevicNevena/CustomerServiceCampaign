@@ -6,18 +6,22 @@ using CustomerService.Validators.EntityValidators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using static Azure.Core.HttpHeader;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace CustomerService.Controllers
 {
+    /// <summary>
+    /// Manages purchase-related operations
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class PurchaseController : ControllerBase
@@ -35,20 +39,25 @@ namespace CustomerService.Controllers
             _httpClient = httpClient;
         }
 
-        // GET: api/<PurchaseController>
+        /// <summary>
+        /// Returns all purchases.
+        /// </summary>
+        /// <returns>A list of all purchases.</returns>
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<Purchase>>> GetPurchases()
         {
             var purchases = await _purchaseService.GetAllPurchasesAsync();
             return Ok(purchases);
         }
 
-        // GET api/<PurchaseController>/5
+        /// <summary>
+        /// Returns a purchase by ID.
+        /// </summary>
+        /// <param name="id">The ID of the purchase to get.</param>
+        /// <returns>The purchase if found; otherwise, a 404 Not Found status.</returns>
         [HttpGet("{id:int}", Name = "GetPurchaseById")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Purchase>> GetPurchaseById(int id)
         {
             try
@@ -62,10 +71,13 @@ namespace CustomerService.Controllers
             }
         }
 
-        // POST api/<PurchaseController>
+        /// <summary>
+        /// Creates a new purchase.
+        /// </summary>
+        /// <param name="purchaseDto">The purchase dto containing the details for creation.</param>
+        /// <returns>The created purchase.</returns>
         [HttpPost("create", Name = "CreatePurchase")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<PurchaseReadDto>> CreatePurchase([FromBody] PurchaseWriteDto purchaseDto)
         {
             if (!User.Identity.IsAuthenticated)
@@ -90,19 +102,13 @@ namespace CustomerService.Controllers
             return Ok(createdPurchase);
         }
 
-        // PUT api/<PurchaseController>/5
-        [HttpPut("{id}")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public void Put(int id, [FromBody] string value)
-        {
-            //Can purchase be changed???
-        }
-
-        // DELETE api/<PurchaseController>/5]
+        /// <summary>
+        /// Deletes a purchase by ID.
+        /// </summary>
+        /// <param name="id">The ID of the purchase to delete.</param>
+        /// <returns>A status indicating the outcome of the operation.</returns>
         [HttpDelete("{id:int}", Name = "DeletePurchase")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeletePurchase(int id)
         {
             try
@@ -116,9 +122,13 @@ namespace CustomerService.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns customer information by ID, using an external SOAP service.
+        /// </summary>
+        /// <param name="customerId">The ID of the customer.</param>
+        /// <returns>Customer information if found; otherwise, a status indicating the error.</returns>
         [HttpGet("customer/{customerId:int}", Name = "GetCustomerInfoById")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<Customer>> GetCustomerInfoById(int customerId)
         {
             if (customerId <= 0)
@@ -177,9 +187,13 @@ namespace CustomerService.Controllers
             }
         }
 
+        /// <summary>
+        /// Checks if a customer exists using an external SOAP service.
+        /// </summary>
+        /// <param name="customerId">The ID of the customer to check.</param>
+        /// <returns>True-customer exists, False-it doesn't</returns>
         [HttpGet("customer-exists/{customerId:int}", Name = "CustomerExistCheck")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CustomerExistCheck(int customerId)
         {
             if (customerId <= 0)

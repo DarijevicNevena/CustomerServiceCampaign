@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System;
+using System.Threading.Tasks;
 using CustomerService.Services.Contracts;
-using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 
 namespace CustomerService.Controllers
 {
+    /// <summary>
+    /// Handles authentication requests
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AuthenticationController : ControllerBase
@@ -20,6 +20,16 @@ namespace CustomerService.Controllers
             _authenticationService = authenticationService;
         }
 
+        /// <summary>
+        /// Authenticates an agent and returns a JWT if credentials are valid.
+        /// </summary>
+        /// <param name="loginDto">Dto containing credentials.</param>
+        /// <returns>A JWT token if authentication is successful.</returns>
+        /// <response code="200">Returns created JWT token.</response>
+        /// <response code="400">If the model state is invalid or the login credentials are incorrect.</response>
+        /// <response code="401">Returned when authentication fails due to invalid credentials.</response>
+        /// <response code="404">Returned when no agent matches the provided email.</response>
+        /// <response code="500">Returned if there is an error during the process of generating the token.</response>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
@@ -49,5 +59,4 @@ namespace CustomerService.Controllers
             }
         }
     }
-
 }

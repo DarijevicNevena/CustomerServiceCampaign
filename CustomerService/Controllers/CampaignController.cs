@@ -3,10 +3,15 @@ using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
 {
-
+    /// <summary>
+    /// Manages campaign-related operations
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CampaignController : ControllerBase
@@ -14,13 +19,16 @@ namespace CustomerService.Controllers
         private readonly ICampaignService _campaignService;
         private readonly ICampaignReportService _reportService;
 
-
         public CampaignController(ICampaignService campaignService, ICampaignReportService reportService)
         {
             _campaignService = campaignService;
             _reportService = reportService;
         }
 
+        /// <summary>
+        /// Retrieves all campaigns.
+        /// </summary>
+        /// <returns>A list of campaigns.</returns>
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<CampaignReadDto>>> GetCampaigns()
@@ -29,6 +37,11 @@ namespace CustomerService.Controllers
             return Ok(campaigns);
         }
 
+        /// <summary>
+        /// Retrieves a specific campaign by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the campaign to retrieve.</param>
+        /// <returns>Return founded campaign or Not Found response</returns>
         [HttpGet("{id:int}", Name = "GetCampaignById")]
         [Authorize]
         public async Task<ActionResult<CampaignReadDto>> GetCampaignById(int id)
@@ -44,6 +57,11 @@ namespace CustomerService.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates a new campaign.
+        /// </summary>
+        /// <param name="campaign">The campaign dto containing creation details.</param>
+        /// <returns>The created campaign data.</returns>
         [HttpPost]
         [Authorize]
         [Route("/createCampaign")]
@@ -60,7 +78,11 @@ namespace CustomerService.Controllers
             }
         }
 
-        //TODO: Check if this is okay to have
+        /// <summary>
+        /// Deletes a campaign by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the campaign to delete.</param>
+        /// <returns>A status indicating the outcome of the operation.</returns>
         [HttpDelete("{id:int}", Name = "DeleteCampaign")]
         [Authorize]
         public async Task<IActionResult> DeleteCampaign(int id)
@@ -76,7 +98,11 @@ namespace CustomerService.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Exports purchases related to a specific campaign into a CSV file.
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign for which to generate the report.</param>
+        /// <returns>A CSV file containing purchase details.</returns>
         [HttpGet("export/{campaignId}")]
         public async Task<IActionResult> ExportPurchasesToCsv(int campaignId)
         {
@@ -98,6 +124,5 @@ namespace CustomerService.Controllers
                 return StatusCode(500, "An error occurred while generating the report: " + ex.Message);
             }
         }
-
     }
 }

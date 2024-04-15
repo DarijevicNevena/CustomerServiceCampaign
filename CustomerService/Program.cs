@@ -9,6 +9,7 @@ using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
 using CustomerService.Data.Base;
 using CustomerService.Models.ModelDto.Mapping;
+using System.Reflection;
 
 public class Program
 {
@@ -118,6 +119,11 @@ public class Program
                     new List<string>()
                 }
             });
+
+            //API Comments
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
         });
     }
 }
