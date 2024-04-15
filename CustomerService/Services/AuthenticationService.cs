@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
 using Microsoft.IdentityModel.Tokens;
@@ -21,19 +22,19 @@ namespace CustomerService.Services
             _mapper = mapper;
         }
 
-        public async Task<AgentReadDto> AuthenticateAgent(string email, string password)
+        public async Task<Agent> AuthenticateAgent(string email, string password)
         {
             var agent = await _agentService.GetAgentByEmailAsync(email);
 
             if (agent != null && VerifyPasswordHash(password, agent.PasswordHash))
             {
-                return _mapper.Map<AgentReadDto>(agent);
+                return agent;
             }
 
             return null;
         }
 
-        public string GenerateJwtToken(AgentReadDto agent)
+        public string GenerateJwtToken(Agent agent)
         {
             var keyString = _configuration["JWT_KEY"];
             if (string.IsNullOrEmpty(keyString))
@@ -44,20 +45,18 @@ namespace CustomerService.Services
 
             var claims = new List<Claim>
     {
-        new Claim(ClaimTypes.Email, agent.Email)
+        new Claim(ClaimTypes.Email, agent.Email),
+        new Claim(ClaimTypes.NameIdentifier, agent.Id.ToString())
     };
 
-            var issuer = _configuration["JWT_ISSUER"] ?? "https://localhost:7264";
-            var audience = _configuration["JWT_AUDIENCE"] ?? "https://localhost:7264";
             var expiry = DateTime.UtcNow.AddHours(1);
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = expiry,
                 SigningCredentials = credentials,
-                Issuer = issuer,
-                Audience = audience
+                Issuer = _configuration["JWT_ISSUER"],
+                Audience = _configuration["JWT_AUDIENCE"]
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

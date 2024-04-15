@@ -52,7 +52,7 @@ namespace CustomerService.Validators.EntityValidators
             }
             else
             {
-                result.CampaignId = campaign.Id;  // Set the CampaignId for later use
+                result.CampaignId = campaign.Id;
 
                 // Check if campaign is still opened when purchase is entered
                 if (DateTime.Today.Date < campaign.StartDate.Date || DateTime.Today.Date > campaign.EndDate.Date)

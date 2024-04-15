@@ -7,7 +7,7 @@ namespace CustomerService.Services.Contracts
     {
         Task<IEnumerable<CampaignReadDto>> GetAllCampaignsAsync();
         Task<CampaignReadDto> GetCampaignByIdAsync(int id);
-        Task<Campaign> GetCampaignByNameAsync(string name);
+        Task<Campaign?> GetCampaignByNameAsync(string name);
         Task<CampaignReadDto> CreateNewCampaignAsync(CampaignWriteDto campaign);
         Task DeleteCampaignAsync(int id);
     }

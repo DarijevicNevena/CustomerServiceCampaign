@@ -56,16 +56,11 @@ namespace CustomerService.Services
             await _campaignRepository.DeleteAsync(id);
         }
 
-        public async Task<Campaign> GetCampaignByNameAsync(string name)
+        public async Task<Campaign?> GetCampaignByNameAsync(string name)
         {
             var campaign = await _campaignRepository.SearchAsync(c =>
               c.CampaignName == name);
-
-            if (campaign == null)
-            {
-                throw new KeyNotFoundException($"Campaign with name {name} not found.");
-            }
-            return campaign.Single();
+            return campaign.SingleOrDefault();
         }
     }
 }

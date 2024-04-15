@@ -23,12 +23,12 @@ namespace CustomerService.Services
             return _mapper.Map<IEnumerable<AgentReadDto>>(agents);
         }
 
-        public async Task<AgentReadDto> GetAgentByIdAsync(int id)
+        public async Task<AgentReadDto?> GetAgentByIdAsync(int id)
         {
             var agent = await _agentRepository.GetByIdAsync(id);
             if (agent == null)
             {
-                throw new KeyNotFoundException($"Agent with ID {id} not found.");
+                return null;
             }
             return _mapper.Map<AgentReadDto>(agent);
         }

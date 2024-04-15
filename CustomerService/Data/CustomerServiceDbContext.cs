@@ -53,6 +53,16 @@ namespace CustomerService.Data
                 .HasOne(p => p.Campaign)
                 .WithMany(c => c.Purchases)
                 .HasForeignKey(p => p.CampaignId);
+
+            modelBuilder.Entity<Purchase>(entity =>
+            {
+                entity.Property(e => e.Price).IsRequired();
+                entity.Property(e => e.Discount).IsRequired();
+
+                // Adding check constraints for Price and Discount
+                entity.HasCheckConstraint("CK_Purchase_Price", "[Price] > 0");
+                entity.HasCheckConstraint("CK_Purchase_Discount", "[Discount] > 0");
+            });
         }
     }
 }

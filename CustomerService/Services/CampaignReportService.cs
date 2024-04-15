@@ -23,7 +23,7 @@ namespace CustomerService.Services
             {
                 throw new KeyNotFoundException("Campaign not found.");
             }
-            /*
+
             //Check if campaign is still opened
             if(campaign.EndDate.Date > DateTime.UtcNow.Date)
             {
@@ -37,7 +37,7 @@ namespace CustomerService.Services
             {
                 throw new InvalidOperationException("You can only obtain a report one month after the campaign end date.");
             }
-            */
+
             //Get purchases for requested campaign
             var purchases = await _purchaseService.GetPurchasesByCampaignAsync(campaignId);
             if (purchases == null || !purchases.Any())
