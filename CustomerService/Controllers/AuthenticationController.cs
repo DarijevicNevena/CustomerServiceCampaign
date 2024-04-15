@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using CustomerService.Services.Contracts;
 using CustomerService.Models.ModelDto;
 
@@ -25,7 +23,7 @@ namespace CustomerService.Controllers
         /// </summary>
         /// <param name="loginDto">Dto containing credentials.</param>
         /// <returns>A JWT token if authentication is successful.</returns>
-        /// <response code="200">Returns created JWT token.</response>
+        /// <response code="200">Returns created JWT token. Please enter Bearer receivedToken into Authorize input (example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)</response>
         /// <response code="400">If the model state is invalid or the login credentials are incorrect.</response>
         /// <response code="401">Returned when authentication fails due to invalid credentials.</response>
         /// <response code="404">Returned when no agent matches the provided email.</response>

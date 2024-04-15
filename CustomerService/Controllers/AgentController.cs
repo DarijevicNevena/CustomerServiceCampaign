@@ -2,8 +2,6 @@
 using CustomerService.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
 {

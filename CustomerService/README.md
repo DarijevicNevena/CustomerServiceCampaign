@@ -220,4 +220,9 @@ User service for customer data (FindPerson): https://www.crcind.com/csp/samples/
   - **Authorization**: Required
   - **Description**: Generates a CSV report detailing all purchases associated with a specific campaign.
   - **Response**: Returns a CSV file with detailed purchase information.
+
+   ```
+      Id,AgentFirstName,AgentLastName,AgentEmail,CampaignName,Price,Discount,PriceWithDiscount,PurchaseDate,CustomerId
+       1,Ivan,Ivanovic,ivanivanovic@gmail.com,test kampanja,1000.00,10.00,90.00,04/13/2024 01:34:40 PM,3
+   ```
   

@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 
 namespace CustomerService.Data.Base
 {
@@ -10,7 +12,7 @@ namespace CustomerService.Data.Base
         public Repository(CustomerServiceDbContext context)
         {
             _context = context;
-            _dbSet = _context.Set<T>(); // Initialize _dbSet
+            _dbSet = _context.Set<T>();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -51,6 +53,18 @@ namespace CustomerService.Data.Base
         public async Task<IEnumerable<T>> SearchAsync(Func<T, bool> predicate)
         {
             return await Task.Run(() => _dbSet.Where(predicate).ToList());
+        }
+
+        public async Task<List<T>> SearchExtendedAsync(Expression<Func<T, bool>> predicate,Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
+        {
+            IQueryable<T> query = _dbSet.Where(predicate);
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

@@ -3,6 +3,7 @@ using CustomerService.Data.Base;
 using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -79,8 +80,9 @@ namespace CustomerService.Services
 
         public async Task<IEnumerable<Purchase>> GetPurchasesByCampaignAsync(int campaignId)
         {
-            var purchases = await _purchaseRepository.SearchAsync(p =>
-              p.CampaignId == campaignId);
+            var purchases = await _purchaseRepository.SearchExtendedAsync(
+             p => p.CampaignId == campaignId,
+             query => query.Include(p => p.Agent));
 
             return purchases.ToList();
         }
