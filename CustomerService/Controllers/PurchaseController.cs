@@ -72,69 +72,6 @@ namespace CustomerService.Controllers
         }
 
         /// <summary>
-        /// Creates a new purchase.
-        /// </summary>
-        /// <param name="purchaseDto">The purchase DTO containing the details for creation.</param>
-        /// <returns>The created purchase.</returns>
-        /// <response code="200">Purchase successfully created</response>
-        /// <response code="400">Bad request if the input is invalid</response>
-        /// <response code="401">Unauthorized if the user is not authenticated</response>
-        [HttpPost("create", Name = "CreatePurchase")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<PurchaseReadDto>> CreatePurchase([FromBody] PurchaseWriteDto purchaseDto)
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
-
-            var agentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(agentId))
-            {
-                return Unauthorized("Agent ID is missing in the token.");
-            }
-
-            purchaseDto.AgentId = int.Parse(agentId);
-            var validationResult = await _purchaseValidator.ValidateAsync(purchaseDto);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.ValidationResult);
-            }
-
-            var createdPurchase = await _purchaseService.CreateNewPurchaseAsync(purchaseDto, validationResult.CampaignId.Value);
-            return Ok(createdPurchase);
-        }
-
-        /// <summary>
-        /// Deletes a purchase by ID.
-        /// </summary>
-        /// <param name="id">The ID of the purchase to delete.</param>
-        /// <returns>A status indicating the outcome of the operation.</returns>
-        /// <response code="204">Purchase successfully deleted</response>
-        /// <response code="404">If the purchase is not found</response>
-        /// <response code="401">Unauthorized if the user is not authenticated</response>
-        [HttpDelete("{id:int}", Name = "DeletePurchase")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> DeletePurchase(int id)
-        {
-            try
-            {
-                await _purchaseService.DeletePurchaseAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
-
-        /// <summary>
         /// Retrieves customer information by ID, using an external SOAP service.
         /// </summary>
         /// <param name="customerId">The ID of the customer.</param>
@@ -253,6 +190,69 @@ namespace CustomerService.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, "Server error");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new purchase.
+        /// </summary>
+        /// <param name="purchaseDto">The purchase DTO containing the details for creation.</param>
+        /// <returns>The created purchase.</returns>
+        /// <response code="200">Purchase successfully created</response>
+        /// <response code="400">Bad request if the input is invalid</response>
+        /// <response code="401">Unauthorized if the user is not authenticated</response>
+        [HttpPost("create", Name = "CreatePurchase")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<PurchaseReadDto>> CreatePurchase([FromBody] PurchaseWriteDto purchaseDto)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            var agentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(agentId))
+            {
+                return Unauthorized("Agent ID is missing in the token.");
+            }
+
+            purchaseDto.AgentId = int.Parse(agentId);
+            var validationResult = await _purchaseValidator.ValidateAsync(purchaseDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.ValidationResult);
+            }
+
+            var createdPurchase = await _purchaseService.CreateNewPurchaseAsync(purchaseDto, validationResult.CampaignId.Value);
+            return Ok(createdPurchase);
+        }
+
+        /// <summary>
+        /// Deletes a purchase by ID.
+        /// </summary>
+        /// <param name="id">The ID of the purchase to delete.</param>
+        /// <returns>A status indicating the outcome of the operation.</returns>
+        /// <response code="204">Purchase successfully deleted</response>
+        /// <response code="404">If the purchase is not found</response>
+        /// <response code="401">Unauthorized if the user is not authenticated</response>
+        [HttpDelete("{id:int}", Name = "DeletePurchase")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> DeletePurchase(int id)
+        {
+            try
+            {
+                await _purchaseService.DeletePurchaseAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
         }
     }

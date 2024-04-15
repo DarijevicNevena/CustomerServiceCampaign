@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CustomerService.Data.Base;
 using CustomerService.Models;
 using CustomerService.Models.ModelDto;
 using CustomerService.Services.Contracts;

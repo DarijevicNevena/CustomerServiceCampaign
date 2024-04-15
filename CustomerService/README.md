@@ -184,7 +184,7 @@ User service for customer data (FindPerson): https://www.crcind.com/csp/samples/
 - **Description**: Deletes a purchase by its ID.
 
 ### Customer Management
-- **Get Customer Information by ID
+- **Get Customer Information by ID**
   - **Endpoint**: `GET /api/Purchase/customer/{customerId}`
   - **Authorization**: Required
   - **Description**: Retrieves customer information by customer ID, utilizing an external SOAP service.

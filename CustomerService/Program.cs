@@ -7,7 +7,6 @@ using CustomerService.Data;
 using CustomerService.Services;
 using CustomerService.Services.Contracts;
 using CustomerService.Validators.EntityValidators;
-using CustomerService.Data.Base;
 using CustomerService.Models.ModelDto.Mapping;
 using System.Reflection;
 

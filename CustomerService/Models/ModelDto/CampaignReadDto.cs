@@ -5,7 +5,7 @@ namespace CustomerService.Models.ModelDto
     public class CampaignReadDto
     {
         [Required]
-        public string CampaignName { get; set; }
+        public string? CampaignName { get; set; }
         [Required]
         public DateTime StartDate { get; set; }
         [Required]

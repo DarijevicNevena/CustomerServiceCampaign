@@ -66,6 +66,42 @@ namespace CustomerService.Controllers
         }
 
         /// <summary>
+        /// Exports purchases related to a specific campaign into a CSV file.
+        /// Sample request: GET /api/Campaign/export/{campaignId}
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign for which to generate the report.</param>
+        /// <returns>A CSV file containing purchase details or an error message.</returns>
+        /// <response code="200">Returns the CSV file</response>
+        /// <response code="400">If an error occurs during data generation</response>
+        /// <response code="404">If the campaign is not found</response>
+        /// <response code="500">If an internal server error occurs</response>
+        [HttpGet("export/{campaignId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ExportPurchasesToCsv(int campaignId)
+        {
+            try
+            {
+                var csvData = await _reportService.GenerateCampaignPurchasesReport(campaignId);
+                return File(new System.Text.UTF8Encoding().GetBytes(csvData), "text/csv", $"campaign_{campaignId}_purchases.csv");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while generating the report: " + ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Creates a new campaign.
         /// Sample request: POST /api/Campaign
         /// </summary>
@@ -117,42 +153,6 @@ namespace CustomerService.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound();
-            }
-        }
-
-        /// <summary>
-        /// Exports purchases related to a specific campaign into a CSV file.
-        /// Sample request: GET /api/Campaign/export/{campaignId}
-        /// </summary>
-        /// <param name="campaignId">The ID of the campaign for which to generate the report.</param>
-        /// <returns>A CSV file containing purchase details or an error message.</returns>
-        /// <response code="200">Returns the CSV file</response>
-        /// <response code="400">If an error occurs during data generation</response>
-        /// <response code="404">If the campaign is not found</response>
-        /// <response code="500">If an internal server error occurs</response>
-        [HttpGet("export/{campaignId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ExportPurchasesToCsv(int campaignId)
-        {
-            try
-            {
-                var csvData = await _reportService.GenerateCampaignPurchasesReport(campaignId);
-                return File(new System.Text.UTF8Encoding().GetBytes(csvData), "text/csv", $"campaign_{campaignId}_purchases.csv");
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An error occurred while generating the report: " + ex.Message);
             }
         }
     }

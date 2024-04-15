@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CustomerService.Data;
+using CustomerService.Services.Contracts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace CustomerService.Data.Base
+namespace CustomerService.Services
 {
     public class Repository<T> : IRepository<T> where T : class
     {
@@ -55,7 +57,7 @@ namespace CustomerService.Data.Base
             return await Task.Run(() => _dbSet.Where(predicate).ToList());
         }
 
-        public async Task<List<T>> SearchExtendedAsync(Expression<Func<T, bool>> predicate,Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
+        public async Task<List<T>> SearchExtendedAsync(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
         {
             IQueryable<T> query = _dbSet.Where(predicate);
 
