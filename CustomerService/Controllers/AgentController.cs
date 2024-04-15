@@ -29,10 +29,12 @@ namespace CustomerService.Controllers
         /// <returns>A list of agent dtos</returns>
         /// <response code="200">Returns the list of agents</response>
         /// <response code="500">If there is an internal server error</response>
+        /// <response code="401">If the user is unauthorized</response>
         [HttpGet]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<AgentReadDto>>> GetAgents()
         {
             var agents = await _agentService.GetAllAgentsAsync();
@@ -50,10 +52,12 @@ namespace CustomerService.Controllers
         /// <returns>Agent Dto</returns>
         /// <response code="200">Returns the requested agent</response>
         /// <response code="404">If no agent is found with the provided ID</response>
+        /// <response code="401">If the user is unauthorized</response>
         [HttpGet("{id:int}", Name = "GetAgentById")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<AgentReadDto>> GetAgentById(int id)
         {
             try
