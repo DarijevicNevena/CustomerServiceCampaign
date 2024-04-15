@@ -118,6 +118,11 @@ namespace CustomerService.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CampaignReadDto>> CreateCampaign([FromBody] CampaignWriteDto campaign)
         {
+            if (campaign == null)
+            {
+                return BadRequest("Campaign cannot be null.");
+            }
+
             try
             {
                 var createdCampaign = await _campaignService.CreateNewCampaignAsync(campaign);

@@ -28,7 +28,7 @@ namespace CustomerService.Services
             var agent = await _agentRepository.GetByIdAsync(id);
             if (agent == null)
             {
-                return null;
+                throw new KeyNotFoundException($"Agent with ID {id} not found.");
             }
             return _mapper.Map<AgentReadDto>(agent);
         }
